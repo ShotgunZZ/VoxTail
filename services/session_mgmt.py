@@ -28,7 +28,7 @@ class MeetingSession:
     # Speaker tracking for auto-cleanup
     pending_speakers: set = field(default_factory=set)  # MEDIUM + LOW speaker IDs needing action
     handled_speakers: set = field(default_factory=set)  # Speakers that have been confirmed/enrolled
-    # LLM-generated summary (cached for Slack/Drive sharing)
+    # LLM-generated summary (cached after generation)
     summary: dict = field(default_factory=lambda: None)
 
     def all_speakers_handled(self) -> bool:
