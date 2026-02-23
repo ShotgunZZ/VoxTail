@@ -28,14 +28,16 @@ def transcribe_with_diarization(audio_path: str, language_code: str = None) -> d
         # Use specified language
         transcription_config = aai.TranscriptionConfig(
             speaker_labels=True,
-            language_code=language_code
+            language_code=language_code,
+            speech_models=["universal-3-pro", "universal-2"]
         )
         logger.info("Transcribing audio with speaker diarization (language: %s)...", language_code)
     else:
         # Use automatic language detection
         transcription_config = aai.TranscriptionConfig(
             speaker_labels=True,
-            language_detection=True
+            language_detection=True,
+            speech_models=["universal-3-pro", "universal-2"]
         )
         logger.info("Transcribing audio with speaker diarization (auto-detecting language)...")
 
