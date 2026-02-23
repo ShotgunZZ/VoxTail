@@ -71,9 +71,8 @@ Railway will prompt you for API keys during setup. You'll need:
 |---------|--------|-----------|
 | [AssemblyAI](https://www.assemblyai.com/) | API key from dashboard | Yes — free credits on signup |
 | [Pinecone](https://www.pinecone.io/) | API key from console | Yes — free starter plan |
+| Pinecone Index Name | Choose any name (e.g., `voxtail`) — created automatically on first run | — |
 | [OpenAI](https://platform.openai.com/) | API key from settings | No — requires payment method |
-
-For `PINECONE_INDEX_NAME`, choose any name you like (e.g., `voxtail`). The app will create the index automatically on first run.
 
 After deploying, Railway gives you a public URL with HTTPS (required for microphone access on mobile).
 
