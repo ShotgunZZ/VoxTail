@@ -36,16 +36,28 @@ Enroll speakers via voice samples, record or upload meetings, and get AI-powered
 
 ## Screenshots
 
-<p align="center">
-  <img src="docs/screenshots/home.png" alt="Home Screen" width="250">
-  <img src="docs/screenshots/recording.png" alt="Recording" width="250">
-  <img src="docs/screenshots/upload-transcribing.jpg" alt="Upload & Transcribing" width="250">
-</p>
-<p align="center">
-  <img src="docs/screenshots/speaker-identification.png" alt="Speaker Identification" width="250">
-  <img src="docs/screenshots/speaker-cards.jpg" alt="Speaker Cards" width="250">
-  <img src="docs/screenshots/enrollment.jpg" alt="Voiceprint Enrollment" width="250">
-</p>
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/home.png" alt="Home Screen" height="500"></td>
+    <td align="center"><img src="docs/screenshots/recording.png" alt="Recording" height="500"></td>
+    <td align="center"><img src="docs/screenshots/upload-transcribing.jpg" alt="Upload & Transcribing" height="500"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Home</b></td>
+    <td align="center"><b>Recording</b></td>
+    <td align="center"><b>Upload & Transcribe</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/speaker-identification.png" alt="Speaker Identification" height="500"></td>
+    <td align="center"><img src="docs/screenshots/speaker-cards.jpg" alt="Speaker Cards" height="500"></td>
+    <td align="center"><img src="docs/screenshots/enrollment.jpg" alt="Voiceprint Enrollment" height="500"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Speaker Identification</b></td>
+    <td align="center"><b>Speaker Cards</b></td>
+    <td align="center"><b>Enrollment</b></td>
+  </tr>
+</table>
 
 ## Get Started
 
