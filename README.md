@@ -49,12 +49,12 @@ Enroll speakers via voice samples, record or upload meetings, and get AI-powered
   </tr>
   <tr>
     <td align="center"><img src="docs/screenshots/speaker-identification.jpg" alt="Speaker Identification" height="500"></td>
-    <td align="center"><img src="docs/screenshots/speaker-cards.jpg" alt="Speaker Cards" height="500"></td>
+    <td align="center"><img src="docs/screenshots/voiceprint-tab.jpg" alt="Voiceprint Tab" height="500"></td>
     <td align="center"><img src="docs/screenshots/enrollment.jpg" alt="Voiceprint Enrollment" height="500"></td>
   </tr>
   <tr>
     <td align="center"><b>Speaker Identification</b></td>
-    <td align="center"><b>Speaker Cards</b></td>
+    <td align="center"><b>Voiceprint Tab</b></td>
     <td align="center"><b>Enrollment</b></td>
   </tr>
 </table>
