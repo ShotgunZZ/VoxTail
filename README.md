@@ -48,7 +48,7 @@ Enroll speakers via voice samples, record or upload meetings, and get AI-powered
     <td align="center"><b>Upload & Transcribe</b></td>
   </tr>
   <tr>
-    <td align="center"><img src="docs/screenshots/speaker-identification.png" alt="Speaker Identification" height="500"></td>
+    <td align="center"><img src="docs/screenshots/speaker-identification.jpg" alt="Speaker Identification" height="500"></td>
     <td align="center"><img src="docs/screenshots/speaker-cards.jpg" alt="Speaker Cards" height="500"></td>
     <td align="center"><img src="docs/screenshots/enrollment.jpg" alt="Voiceprint Enrollment" height="500"></td>
   </tr>
