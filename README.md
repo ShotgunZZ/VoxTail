@@ -10,7 +10,6 @@ Enroll speakers via voice samples, record or upload meetings, and get AI-powered
 - **Meeting Identification** — Automatically label who said what with confidence levels
 - **AI Summaries** — Executive summary, action items, key decisions via OpenAI GPT
 - **Audio Clip Playback** — Listen to speaker clips to verify identity
-- **Slack & Google Drive** — Share summaries to Slack or save as Google Docs
 - **Installable PWA** — Add to home screen, works on phone and desktop
 
 ## How It Works
@@ -105,11 +104,6 @@ python app.py
 
 Open http://localhost:8000
 
-### Optional Integrations
-
-- **Slack** — Set `SLACK_WEBHOOK_URL` in `.env` to post meeting summaries to a channel
-- **Google Drive** — Set `GOOGLE_SERVICE_ACCOUNT_JSON` and `GOOGLE_DRIVE_FOLDER_ID` to save summaries as Google Docs
-
 ## Cost Breakdown
 
 | Service | Cost | Free Tier |
@@ -130,8 +124,6 @@ Open http://localhost:8000
 | `GET` | `/api/meeting/{id}/speaker/{sid}/clip` | Get a 3-5s audio clip of a speaker |
 | `POST` | `/api/meeting/{id}/summary` | Generate AI meeting summary |
 | `GET` | `/api/meeting/{id}/summary` | Retrieve generated summary |
-| `POST` | `/api/meeting/{id}/share/slack` | Share summary to Slack |
-| `POST` | `/api/meeting/{id}/share/gdrive` | Save summary to Google Drive |
 | `GET` | `/api/speakers` | List enrolled speakers |
 | `DELETE` | `/api/speakers/{name}` | Delete a speaker profile |
 
@@ -146,17 +138,14 @@ Open http://localhost:8000
 │   ├── enrollment.py        #   /api/enroll, /api/enroll-from-meeting
 │   ├── confirmation.py      #   /api/confirm-speaker
 │   ├── speakers.py          #   /api/speakers
-│   ├── summary.py           #   /api/meeting/{id}/summary
-│   └── sharing.py           #   /api/meeting/{id}/share/slack, /share/gdrive
+│   └── summary.py           #   /api/meeting/{id}/summary
 ├── services/                # Business logic (no HTTP concerns)
 │   ├── speaker_encoder.py   #   ECAPA-TDNN model wrapper (192-dim embeddings)
 │   ├── pinecone_db.py       #   Vector DB operations
 │   ├── matching.py          #   Competitive matching (HIGH/MEDIUM/LOW)
 │   ├── assemblyai_svc.py    #   Transcription + speaker diarization
 │   ├── audio.py             #   Audio conversion, segmentation, stitching
-│   ├── llm_summary.py       #   OpenAI GPT meeting summaries
-│   ├── slack_svc.py         #   Slack webhook integration
-│   └── gdrive_svc.py        #   Google Drive integration
+│   └── llm_summary.py       #   OpenAI GPT meeting summaries
 ├── static/                  # Frontend (vanilla JS, ES modules, no build step)
 │   ├── index.html           #   Single-page HTML
 │   ├── sw.js                #   Service worker (cache-first)

@@ -22,7 +22,6 @@ brew install ffmpeg  # macOS - required for audio processing
 # Configure API keys
 cp .env.example .env
 # Edit .env: PINECONE_API_KEY, PINECONE_INDEX_NAME, ASSEMBLYAI_API_KEY, OPENAI_API_KEY
-# Optional: SLACK_WEBHOOK_URL, GOOGLE_SERVICE_ACCOUNT_JSON, GOOGLE_DRIVE_FOLDER_ID, INVITE_CODE, ADMIN_CODE
 
 # One-time Pinecone index setup (192 dimensions, cosine similarity)
 python setup_pinecone.py
@@ -37,15 +36,13 @@ python app.py
 ### Backend Structure
 
 ```
-app.py                    # FastAPI entry point - mounts routers, startup sync, invite code middleware
+app.py                    # FastAPI entry point - mounts routers, startup sync
 routes/
 ├── __init__.py           # Combines all routers under /api prefix
 ├── enrollment.py         # POST /api/enroll, /api/enroll-from-meeting
 ├── identification.py     # POST /api/identify (SSE stream), GET /api/meeting/{id}, GET /api/meeting/{id}/speaker/{sid}/clip
 ├── speakers.py           # GET/DELETE /api/speakers, POST /api/speakers/sync
 ├── confirmation.py       # POST /api/confirm-speaker, /api/meeting/{id}/cleanup
-├── sharing.py            # POST /api/meeting/{id}/share/slack, /share/gdrive (admin-only)
-├── consent.py            # POST /api/consent — logs structured [CONSENT] records for biometric consent
 └── utils.py              # temp_file context manager, save_upload helper
 services/
 ├── enrollment_svc.py     # Business logic: enroll_speaker, validate_audio_duration
@@ -60,8 +57,6 @@ services/
 ├── vad_service.py        # Silero VAD — strips silence before embedding extraction
 ├── speaker_mapping.py    # Shared speaker name mapping utility
 ├── llm_summary.py        # OpenAI GPT integration for meeting summaries
-├── slack_svc.py          # Slack webhook — Block Kit formatting, send to channel
-├── gdrive_svc.py         # Google Drive — create formatted Google Doc via service account
 └── analytics.py          # Anonymous usage analytics — structured log events for Railway
 config.py                 # All thresholds and parameters (with validate())
 ```
@@ -80,8 +75,8 @@ static/
 │   ├── history.css       # History cards, settings section, clear button
 │   └── layout.css        # Desktop/mobile media queries (loaded last)
 └── js/
-    ├── main.js           # Entry point, login gate, screen navigation, PWA registration
-    ├── api-client.js     # API fetch wrapper (includes X-Invite-Code + X-Device-ID headers, returns raw Response for SSE endpoints)
+    ├── main.js           # Entry point, screen navigation, PWA registration
+    ├── api-client.js     # API fetch wrapper (includes X-Device-ID header, returns raw Response for SSE endpoints)
     ├── state.js          # Global state management
     ├── enrollment.js     # Enrollment UI component
     ├── identification.js # Orchestrator: file upload, recording, delegates to sub-modules
@@ -91,7 +86,6 @@ static/
     ├── pending-decisions.js # Deferred speaker decisions with undo support
     ├── transcript.js     # Transcript rendering with speaker avatars
     ├── summary.js        # AI summary generation, section rendering, copy-to-clipboard
-    ├── sharing.js        # Slack + Google Drive share handlers (admin-only)
     ├── history.js        # IndexedDB meeting history — save, render, delete, prune (max 50)
     ├── recorder.js       # MediaRecorder API wrapper
     └── utils.js          # escapeHtml, formatTime, formatDuration
@@ -133,14 +127,12 @@ Competitive assignment uses Hungarian algorithm (scipy `linear_sum_assignment`) 
 
 **Meeting History** (static/js/history.js): Meetings are saved to browser-local IndexedDB after summary generation. Stores up to 50 entries with auto-pruning. The Settings screen (`screenSettings`) displays history as accordion cards with executive summary, action items, decisions, and topics. Clear-all button available in the settings section.
 
-**Anonymous Analytics** (services/analytics.py): Structured JSON log lines prefixed with `[ANALYTICS]`, captured by Railway's built-in log system. Events: `meeting.processed` (duration, speaker_count), `summary.generated` (speaker names), `speaker.enrolled`, `share.slack`, `share.gdrive`. Each event includes an anonymous `device_id` from the `X-Device-ID` header.
+**Anonymous Analytics** (services/analytics.py): Structured JSON log lines prefixed with `[ANALYTICS]`, captured by Railway's built-in log system. Events: `meeting.processed` (duration, speaker_count), `summary.generated` (speaker names), `speaker.enrolled`. Each event includes an anonymous `device_id` from the `X-Device-ID` header.
 
 **Device ID** (static/js/main.js → api-client.js): A persistent anonymous UUID generated via `crypto.randomUUID()` on first visit, stored in `localStorage` as `voxtail_device_id`. Sent as `X-Device-ID` header on all API requests.
 
 ## API Endpoints
 
-- `POST /api/validate-invite` - Validate invite code, returns `{valid, admin}` (exempt from middleware)
-- `POST /api/consent` - Log biometric consent acceptance, returns `{accepted: true}`
 - `POST /api/enroll` - Enroll speaker (form: name, audio)
 - `POST /api/enroll-from-meeting` - Enroll from meeting segments
 - `POST /api/identify` - Identify speakers via SSE stream (progress events → done with meeting_id)
@@ -153,16 +145,6 @@ Competitive assignment uses Hungarian algorithm (scipy `linear_sum_assignment`) 
 - `DELETE /api/speakers/{name}` - Delete speaker
 - `POST /api/speakers/sync` - Sync from Pinecone
 - `POST /api/confirm-speaker` - Confirm MEDIUM confidence match
-- `POST /api/meeting/{id}/share/slack` - Share summary to Slack via webhook (admin-only)
-- `POST /api/meeting/{id}/share/gdrive` - Save summary to Google Drive as Google Doc (admin-only)
-
-## Access Control
-
-**Invite Code Gate** (app.py middleware): All `/api/*` routes (except `/api/validate-invite`) require a valid `X-Invite-Code` header matching either `INVITE_CODE` or `ADMIN_CODE`. If neither env var is set, the gate is disabled.
-
-**Admin Code** (routes/sharing.py): Share endpoints (`/share/slack`, `/share/gdrive`) additionally require the `ADMIN_CODE`. Regular invite code users get 403. Frontend hides share buttons for non-admin users via `initSharing(isAdmin)`.
-
-**Frontend Flow** (main.js): On load, checks `localStorage.voxtail_invite_code`. If present, validates via `/api/validate-invite` and stores admin flag. Login screen shown if no valid code. After login, checks `localStorage.voxtail_consent_accepted` — if missing, shows consent screen with biometric data disclosure. On accept, `POST /api/consent` logs a structured `[CONSENT]` record and stores the flag. Returning users skip consent. `body.app-ready` class controls desktop layout visibility.
 
 ## Important Notes
 
@@ -170,5 +152,5 @@ Competitive assignment uses Hungarian algorithm (scipy `linear_sum_assignment`) 
 - AssemblyAI costs ~$0.90/hour of audio
 - Model runs on CPU (device="cpu" in speaker_encoder.py)
 - Frontend uses ES modules with `escapeHtml()` for XSS prevention
-- **Service Worker Caching**: `static/sw.js` uses cache-first. After changing any file in `static/`, bump `CACHE_NAME` in `sw.js` (currently `v31`). The browser auto-reloads when the new SW activates. `app.py` serves `sw.js` with `Cache-Control: no-cache` so browsers always check for updates.
+- **Service Worker Caching**: `static/sw.js` uses cache-first. After changing any file in `static/`, bump `CACHE_NAME` in `sw.js` (currently `v32`). The browser auto-reloads when the new SW activates. `app.py` serves `sw.js` with `Cache-Control: no-cache` so browsers always check for updates.
 
