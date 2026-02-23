@@ -36,7 +36,16 @@ Enroll speakers via voice samples, record or upload meetings, and get AI-powered
 
 ## Screenshots
 
-> *Coming soon — screenshots of speaker cards, transcript view, and AI summary*
+<p align="center">
+  <img src="docs/screenshots/home.png" alt="Home Screen" width="250">
+  <img src="docs/screenshots/recording.png" alt="Recording" width="250">
+  <img src="docs/screenshots/upload-transcribing.jpg" alt="Upload & Transcribing" width="250">
+</p>
+<p align="center">
+  <img src="docs/screenshots/speaker-identification.png" alt="Speaker Identification" width="250">
+  <img src="docs/screenshots/speaker-cards.jpg" alt="Speaker Cards" width="250">
+  <img src="docs/screenshots/enrollment.jpg" alt="Voiceprint Enrollment" width="250">
+</p>
 
 ## Get Started
 
