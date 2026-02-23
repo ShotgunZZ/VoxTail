@@ -67,12 +67,12 @@ Enroll speakers via voice samples, record or upload meetings, and get AI-powered
 
 Railway will prompt you for API keys during setup. You'll need:
 
-| Service | Signup | Free Tier |
-|---------|--------|-----------|
-| [AssemblyAI](https://www.assemblyai.com/) | API key from dashboard | Yes — free credits on signup |
-| [Pinecone](https://www.pinecone.io/) | API key from console | Yes — free starter plan |
-| Pinecone Index Name | Choose any name (e.g., `voxtail`) — created automatically on first run | — |
-| [OpenAI](https://platform.openai.com/) | API key from settings | No — requires payment method |
+| Variable | How to get it |
+|----------|---------------|
+| `ASSEMBLYAI_API_KEY` | Sign up at [assemblyai.com](https://www.assemblyai.com/) → copy API key from dashboard (free credits on signup) |
+| `PINECONE_API_KEY` | Sign up at [pinecone.io](https://www.pinecone.io/) → copy API key from console (free starter plan) |
+| `PINECONE_INDEX_NAME` | Choose any name (e.g., `voxtail`) — created automatically on first run |
+| `OPENAI_API_KEY` | Sign up at [platform.openai.com](https://platform.openai.com/) → copy API key from settings (requires payment method) |
 
 After deploying, Railway gives you a public URL with HTTPS (required for microphone access on mobile).
 
