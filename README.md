@@ -42,7 +42,7 @@ Enroll speakers via voice samples, record or upload meetings, and get AI-powered
 
 ### Option 1: Deploy to Railway (recommended for mobile use)
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/XXXXX?referralCode=XXXXX)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/h4Mkll?referralCode=A_vbl-)
 
 Railway will prompt you for API keys during setup. You'll need:
 
