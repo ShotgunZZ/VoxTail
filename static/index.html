@@ -23,39 +23,6 @@
 </head>
 <body>
 
-    <!-- ===== Screen: Login ===== -->
-    <div class="screen" id="screenLogin">
-        <div class="screen-content login-content">
-            <h1 class="brand-title">VoxTail</h1>
-            <p class="brand-subtitle">Enter your invitation code to continue</p>
-            <div class="login-form">
-                <input type="text" id="inviteCodeInput" placeholder="Invitation code" autocomplete="off">
-                <button id="inviteSubmitBtn" class="btn-primary">Enter</button>
-                <div class="status" id="inviteStatus"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== Screen: Consent ===== -->
-    <div class="screen" id="screenConsent">
-        <div class="screen-content login-content">
-            <h1 class="brand-title">VoxTail</h1>
-            <p class="brand-subtitle">Before you continue, please review how we handle voice data.</p>
-            <div class="consent-text">
-                <p><strong>What we collect:</strong> When you enroll a speaker or identify speakers in a meeting, we create a numeric voiceprint from the audio. This voiceprint is biometric data — it is derived from characteristics of a person's voice.</p>
-                <p><strong>How it's stored:</strong> Voiceprints are stored securely in a cloud database along with the speaker name you provide. Audio recordings are processed temporarily and deleted automatically — they are not stored long-term.</p>
-                <p><strong>Third-party processing:</strong> Meeting audio is sent to third-party services for transcription and AI summaries. These services process data under their respective data processing agreements.</p>
-                <p><strong>Your rights:</strong> You can delete any enrolled speaker and their voiceprint at any time from the Voiceprint Library. To request full data deletion, contact the app administrator.</p>
-                <p><strong>Important:</strong> If you record a meeting, you are responsible for informing all participants that their voice will be processed for speaker identification.</p>
-            </div>
-            <label class="consent-checkbox">
-                <input type="checkbox" id="consentCheckbox">
-                <span>I understand and agree to the collection and processing of voice biometric data as described above.</span>
-            </label>
-            <button id="consentContinueBtn" class="btn-primary" disabled>I Agree</button>
-        </div>
-    </div>
-
     <!-- ===== Screen: Home ===== -->
     <div class="screen" id="screenHome">
         <div class="screen-content home-content">
@@ -177,19 +144,6 @@
                             </div>
                         </div>
                         <button id="copyAllSummary" class="copy-all-btn">Copy Full Summary</button>
-                        <div class="share-actions">
-                            <p class="share-label">Share</p>
-                            <div class="share-btn-row">
-                                <button id="shareSlackBtn" class="share-btn share-btn-slack">
-                                    <svg class="share-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zm0 1.271a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zm6.124 5.042a2.528 2.528 0 0 1 2.521-2.521A2.528 2.528 0 0 1 20 8.834a2.528 2.528 0 0 1-2.521 2.521h-2.521V8.834zm-1.272 0a2.528 2.528 0 0 1-2.521 2.521 2.528 2.528 0 0 1-2.521-2.521V2.522A2.528 2.528 0 0 1 11.165 0a2.528 2.528 0 0 1 2.521 2.522v6.312zm-6.124 5.042a2.528 2.528 0 0 1 2.521 2.521A2.528 2.528 0 0 1 11.165 24a2.528 2.528 0 0 1-2.521-2.521v-2.521h2.521zm0-1.272a2.528 2.528 0 0 1-2.521-2.521 2.528 2.528 0 0 1 2.521-2.521h6.313A2.528 2.528 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.521h-6.312z"/></svg>
-                                    <span class="share-btn-label">Send to Slack</span>
-                                </button>
-                                <button id="shareGDriveBtn" class="share-btn share-btn-gdrive">
-                                    <svg class="share-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M4.433 22.396l4-6.93H24l-4 6.93H4.433zm3.566-6.93L0 1.604h7.784L15.57 15.466H7.999zm8.282 0L8.718 1.604h7.784l7.498 13.862h-7.717z"/></svg>
-                                    <span class="share-btn-label">Save to Drive</span>
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

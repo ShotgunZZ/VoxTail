@@ -3,33 +3,13 @@
  */
 
 /**
- * Get common headers for API requests (invite code + device ID)
+ * Get common headers for API requests
  */
 export function getCommonHeaders() {
     const headers = {};
-    const code = localStorage.getItem('voxtail_invite_code');
-    if (code) headers['X-Invite-Code'] = code;
     const deviceId = localStorage.getItem('voxtail_device_id');
     if (deviceId) headers['X-Device-ID'] = deviceId;
     return headers;
-}
-
-/**
- * Accept biometric consent
- * @returns {Promise<Object>} Response data
- */
-export async function acceptConsent() {
-    const response = await fetch('/api/consent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...getCommonHeaders() },
-        body: JSON.stringify({ type: 'biometric', version: '1.0' })
-    });
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(data.detail || 'Consent submission failed');
-    }
-    return data;
 }
 
 /**
@@ -172,38 +152,3 @@ export async function generateSummary(meetingId) {
     return data;
 }
 
-/**
- * Share meeting summary to Slack
- * @param {string} meetingId - Meeting ID
- * @returns {Promise<Object>} Response data
- */
-export async function shareToSlack(meetingId) {
-    const response = await fetch(`/api/meeting/${meetingId}/share/slack`, {
-        method: 'POST',
-        headers: getCommonHeaders()
-    });
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(data.detail || 'Failed to share to Slack');
-    }
-    return data;
-}
-
-/**
- * Upload meeting notes to Google Drive
- * @param {string} meetingId - Meeting ID
- * @returns {Promise<Object>} Response with url
- */
-export async function shareToGDrive(meetingId) {
-    const response = await fetch(`/api/meeting/${meetingId}/share/gdrive`, {
-        method: 'POST',
-        headers: getCommonHeaders()
-    });
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(data.detail || 'Failed to upload to Google Drive');
-    }
-    return data;
-}

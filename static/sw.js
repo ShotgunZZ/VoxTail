@@ -1,5 +1,5 @@
 // Service Worker for Speaker Recognition PWA
-const CACHE_NAME = 'voiceid-v31';
+const CACHE_NAME = 'voiceid-v32';
 const STATIC_ASSETS = [
   '/',
   '/static/index.html',
@@ -21,7 +21,6 @@ const STATIC_ASSETS = [
   '/static/js/pending-decisions.js',
   '/static/js/transcript.js',
   '/static/js/summary.js',
-  '/static/js/sharing.js',
   '/static/js/recorder.js',
   '/static/js/history.js',
   '/static/js/utils.js',

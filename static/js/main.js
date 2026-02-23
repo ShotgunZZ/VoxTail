@@ -4,9 +4,7 @@
 
 import { initEnrollment } from './enrollment.js';
 import { initIdentification } from './identification.js';
-import { initSharing } from './sharing.js';
 import { renderHistory, clearHistory } from './history.js';
-import { acceptConsent } from './api-client.js';
 
 /**
  * Navigate to a screen by ID.
@@ -159,57 +157,10 @@ function registerServiceWorker() {
 }
 
 /**
- * Show consent screen and wire up accept flow
+ * Initialize the main app
  */
-function showConsent(isAdmin) {
-    navigateTo('screenConsent');
-
-    const checkbox = document.getElementById('consentCheckbox');
-    const btn = document.getElementById('consentContinueBtn');
-
-    // Reset state in case of re-display
-    checkbox.checked = false;
-    btn.disabled = true;
-
-    // Clone to remove old listeners
-    const newCheckbox = checkbox.cloneNode(true);
-    checkbox.parentNode.replaceChild(newCheckbox, checkbox);
-    const newBtn = btn.cloneNode(true);
-    btn.parentNode.replaceChild(newBtn, btn);
-
-    newCheckbox.addEventListener('change', () => {
-        newBtn.disabled = !newCheckbox.checked;
-    });
-
-    newBtn.addEventListener('click', async () => {
-        newBtn.disabled = true;
-        newBtn.textContent = 'Submitting...';
-        try {
-            await acceptConsent();
-            localStorage.setItem('voxtail_consent_accepted', 'true');
-            localStorage.setItem('voxtail_consent_ts', new Date().toISOString());
-            initApp(isAdmin);
-        } catch (err) {
-            console.error('[Consent] Failed:', err);
-            newBtn.textContent = 'I Agree';
-            newBtn.disabled = !newCheckbox.checked;
-        }
-    });
-}
-
-/**
- * Initialize the main app (called after invite code is validated)
- */
-function initApp(isAdmin = false) {
-    // Check consent gate
-    if (!localStorage.getItem('voxtail_consent_accepted')) {
-        showConsent(isAdmin);
-        return;
-    }
-
+function initApp() {
     document.body.classList.add('app-ready');
-    document.getElementById('screenLogin').classList.remove('active');
-    document.getElementById('screenConsent')?.classList.remove('active');
     document.getElementById('screenHome').classList.add('active');
 
     initTabBar();
@@ -219,7 +170,6 @@ function initApp(isAdmin = false) {
     initAccordions();
     initEnrollment();
     initIdentification();
-    initSharing(isAdmin);
 
     // Initialize history
     const historyList = document.getElementById('historyList');
@@ -237,57 +187,7 @@ function initApp(isAdmin = false) {
 }
 
 /**
- * Show login screen
- */
-function showLogin() {
-    document.getElementById('screenLogin').classList.add('active');
-
-    const input = document.getElementById('inviteCodeInput');
-    const btn = document.getElementById('inviteSubmitBtn');
-    const status = document.getElementById('inviteStatus');
-
-    async function submitCode() {
-        const code = input.value.trim();
-        if (!code) return;
-
-        btn.disabled = true;
-        status.className = 'status loading';
-        status.textContent = 'Validating...';
-
-        try {
-            const res = await fetch('/api/validate-invite', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code })
-            });
-
-            if (res.ok) {
-                const data = await res.json();
-                localStorage.setItem('voxtail_invite_code', code);
-                localStorage.setItem('voxtail_is_admin', data.admin ? 'true' : 'false');
-                status.className = 'status';
-                status.textContent = '';
-                initApp(data.admin);
-            } else {
-                status.className = 'status error';
-                status.textContent = 'Invalid invitation code';
-                btn.disabled = false;
-            }
-        } catch {
-            status.className = 'status error';
-            status.textContent = 'Connection error. Please try again.';
-            btn.disabled = false;
-        }
-    }
-
-    btn.addEventListener('click', submitCode);
-    input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') submitCode();
-    });
-}
-
-/**
- * Check invite code and initialize application
+ * Initialize application
  */
 async function init() {
     registerServiceWorker();
@@ -297,35 +197,7 @@ async function init() {
         localStorage.setItem('voxtail_device_id', crypto.randomUUID());
     }
 
-    const savedCode = localStorage.getItem('voxtail_invite_code');
-
-    if (savedCode) {
-        // Validate the saved code is still valid
-        try {
-            const res = await fetch('/api/validate-invite', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: savedCode })
-            });
-
-            if (res.ok) {
-                const data = await res.json();
-                localStorage.setItem('voxtail_is_admin', data.admin ? 'true' : 'false');
-                initApp(data.admin);
-                return;
-            }
-        } catch {
-            // Server error — let them in with saved code (offline/startup)
-            const isAdmin = localStorage.getItem('voxtail_is_admin') === 'true';
-            initApp(isAdmin);
-            return;
-        }
-
-        // Code is no longer valid
-        localStorage.removeItem('voxtail_invite_code');
-    }
-
-    showLogin();
+    initApp();
 }
 
 // Wait for DOM to be ready

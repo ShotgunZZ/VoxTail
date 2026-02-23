@@ -16,21 +16,6 @@
         display: block;
     }
 
-    /* Hide login screen on desktop once app is active */
-    body.app-ready #screenLogin {
-        display: none !important;
-    }
-
-    /* Hide consent screen on desktop once app is active */
-    body.app-ready #screenConsent {
-        display: none !important;
-    }
-
-    /* When login is showing, hide all other screens */
-    body:not(.app-ready) .screen:not(#screenLogin):not(#screenConsent) {
-        display: none !important;
-    }
-
     .screen-nav {
         display: none;
     }
