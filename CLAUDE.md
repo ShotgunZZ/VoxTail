@@ -164,10 +164,6 @@ Competitive assignment uses Hungarian algorithm (scipy `linear_sum_assignment`) 
 
 **Frontend Flow** (main.js): On load, checks `localStorage.voxtail_invite_code`. If present, validates via `/api/validate-invite` and stores admin flag. Login screen shown if no valid code. After login, checks `localStorage.voxtail_consent_accepted` — if missing, shows consent screen with biometric data disclosure. On accept, `POST /api/consent` logs a structured `[CONSENT]` record and stores the flag. Returning users skip consent. `body.app-ready` class controls desktop layout visibility.
 
-**Environment Variables:**
-- `INVITE_CODE` — Shared code for regular users (empty = no gate)
-- `ADMIN_CODE` — Admin code with sharing access (empty = sharing open to all)
-
 ## Important Notes
 
 - Pinecone is source of truth; `speakers.json` syncs on startup
