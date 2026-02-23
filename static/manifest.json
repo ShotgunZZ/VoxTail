@@ -1,0 +1,32 @@
+{
+  "name": "VoxTail",
+  "short_name": "VoxTail",
+  "description": "Record meetings and identify speakers automatically",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F5F4F1",
+  "theme_color": "#E86A33",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/static/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Record Meeting",
+      "url": "/?action=record",
+      "description": "Start recording a meeting"
+    }
+  ]
+}

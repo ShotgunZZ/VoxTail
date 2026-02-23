@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#E86A33">
+    <meta name="description" content="Identify speakers in meetings using voice recognition">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="VoxTail">
+    <title>VoxTail</title>
+    <link rel="stylesheet" href="/static/css/tokens.css">
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/speaker-cards.css">
+    <link rel="stylesheet" href="/static/css/transcript.css">
+    <link rel="stylesheet" href="/static/css/summary.css">
+    <link rel="stylesheet" href="/static/css/history.css">
+    <link rel="stylesheet" href="/static/css/layout.css">
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="/static/icons/icon-192.png">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ===== Screen: Login ===== -->
+    <div class="screen" id="screenLogin">
+        <div class="screen-content login-content">
+            <h1 class="brand-title">VoxTail</h1>
+            <p class="brand-subtitle">Enter your invitation code to continue</p>
+            <div class="login-form">
+                <input type="text" id="inviteCodeInput" placeholder="Invitation code" autocomplete="off">
+                <button id="inviteSubmitBtn" class="btn-primary">Enter</button>
+                <div class="status" id="inviteStatus"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Screen: Consent ===== -->
+    <div class="screen" id="screenConsent">
+        <div class="screen-content login-content">
+            <h1 class="brand-title">VoxTail</h1>
+            <p class="brand-subtitle">Before you continue, please review how we handle voice data.</p>
+            <div class="consent-text">
+                <p><strong>What we collect:</strong> When you enroll a speaker or identify speakers in a meeting, we create a numeric voiceprint from the audio. This voiceprint is biometric data — it is derived from characteristics of a person's voice.</p>
+                <p><strong>How it's stored:</strong> Voiceprints are stored securely in a cloud database along with the speaker name you provide. Audio recordings are processed temporarily and deleted automatically — they are not stored long-term.</p>
+                <p><strong>Third-party processing:</strong> Meeting audio is sent to third-party services for transcription and AI summaries. These services process data under their respective data processing agreements.</p>
+                <p><strong>Your rights:</strong> You can delete any enrolled speaker and their voiceprint at any time from the Voiceprint Library. To request full data deletion, contact the app administrator.</p>
+                <p><strong>Important:</strong> If you record a meeting, you are responsible for informing all participants that their voice will be processed for speaker identification.</p>
+            </div>
+            <label class="consent-checkbox">
+                <input type="checkbox" id="consentCheckbox">
+                <span>I understand and agree to the collection and processing of voice biometric data as described above.</span>
+            </label>
+            <button id="consentContinueBtn" class="btn-primary" disabled>I Agree</button>
+        </div>
+    </div>
+
+    <!-- ===== Screen: Home ===== -->
+    <div class="screen" id="screenHome">
+        <div class="screen-content home-content">
+            <div class="home-hero">
+                <button id="recordBtn" class="record-btn">
+                    <svg class="record-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="1" width="6" height="11" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                    <span class="record-stop-icon"></span>
+                </button>
+                <div id="recordingControls" class="recording-controls hidden">
+                    <div class="recording-indicator">
+                        <span class="pulse"></span>
+                        <span id="recordTimer">00:00</span>
+                    </div>
+                    <p class="recording-hint">Tap to stop</p>
+                </div>
+                <h1 class="brand-title">VoxTail</h1>
+                <p class="brand-cta" id="recordCta">Tap to Record</p>
+                <p class="brand-subtitle">Record meetings and identify speakers automatically</p>
+            </div>
+
+            <a href="#" id="showUploadBtn" class="upload-toggle">Upload file instead</a>
+
+            <div class="upload-section hidden" id="uploadSection">
+                <div class="drop-zone" id="identifyDropZone">
+                    <p>Drag & drop a meeting recording here, or click to select</p>
+                    <p class="drop-zone-hint">Supports: MP3, M4A, WAV, etc.</p>
+                    <input type="file" id="identifyFile" accept="audio/*,.m4a,.mp3,.wav,.ogg,.webm,.mp4,.aac">
+                </div>
+                <div class="file-info" id="identifyFileInfo"></div>
+                <button id="identifyBtn" class="btn-primary" disabled>Identify Speakers</button>
+            </div>
+
+            <div class="status" id="identifyStatus"></div>
+        </div>
+    </div>
+
+    <!-- ===== Screen: Speaker ID ===== -->
+    <div class="screen" id="screenSpeakerID">
+        <div class="screen-nav">
+            <button class="back-btn" data-target="screenHome">&#8592;</button>
+            <h2 class="screen-title">Identify Speakers</h2>
+            <div class="nav-spacer"></div>
+        </div>
+        <div class="screen-content scrollable">
+            <p class="screen-desc">Review speaker identifications from your voiceprint library.</p>
+            <div class="progress-bar-container" id="progressContainer">
+                <div class="progress-bar" id="progressBar"></div>
+                <span class="progress-text" id="progressText">0/0</span>
+            </div>
+            <div class="speaker-summary" id="speakerSummary"></div>
+            <div class="screen-bottom-actions">
+                <button id="confirmSpeakersBtn" class="btn-primary btn-large">Confirm Speakers</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Screen: Results ===== -->
+    <div class="screen" id="screenResults">
+        <div class="screen-nav">
+            <button class="back-btn" data-target="screenHome">&#8592;</button>
+            <h2 class="screen-title">Meeting Summary</h2>
+            <div class="nav-spacer"></div>
+        </div>
+        <div class="screen-content scrollable">
+            <div class="meeting-info" id="meetingInfo"></div>
+
+            <div class="tab-switcher" id="tabSwitcher">
+                <button class="tab-btn active" data-tab="transcript">Transcript</button>
+                <button class="tab-btn" data-tab="summary">AI Summary</button>
+            </div>
+
+            <div class="tab-content active" id="tabTranscript">
+                <div class="transcript" id="transcript"></div>
+            </div>
+
+            <div class="tab-content" id="tabSummary">
+                <div class="summary-section" id="summarySection">
+                    <button id="generateSummaryBtn" class="summary-btn">
+                        <span class="btn-icon">&#9733;</span> Generate Summary
+                    </button>
+                    <div class="status" id="summaryStatus"></div>
+                    <div id="summaryContent" class="hidden">
+                        <div class="summary-card" id="summaryExecutive" data-section="executive">
+                            <div class="summary-card-header">
+                                <h4>Executive Summary</h4>
+                                <span class="accordion-chevron">&#9660;</span>
+                            </div>
+                            <div class="summary-card-content">
+                                <p id="executiveSummary"></p>
+                                <button class="copy-btn" data-target="executiveSummary">Copy</button>
+                            </div>
+                        </div>
+                        <div class="summary-card" id="summaryActions" data-section="actions">
+                            <div class="summary-card-header">
+                                <h4>Action Items <span class="section-count" id="actionItemsCount"></span></h4>
+                                <span class="accordion-chevron">&#9660;</span>
+                            </div>
+                            <div class="summary-card-content">
+                                <ul id="actionItems"></ul>
+                                <button class="copy-btn" data-target="actionItems">Copy</button>
+                            </div>
+                        </div>
+                        <div class="summary-card collapsed" id="summaryDecisions" data-section="decisions">
+                            <div class="summary-card-header">
+                                <h4>Key Decisions <span class="section-count" id="keyDecisionsCount"></span></h4>
+                                <span class="accordion-chevron">&#9660;</span>
+                            </div>
+                            <div class="summary-card-content">
+                                <ul id="keyDecisions"></ul>
+                            </div>
+                        </div>
+                        <div class="summary-card collapsed" id="summaryTopics" data-section="topics">
+                            <div class="summary-card-header">
+                                <h4>Topics Discussed <span class="section-count" id="topicsDiscussedCount"></span></h4>
+                                <span class="accordion-chevron">&#9660;</span>
+                            </div>
+                            <div class="summary-card-content">
+                                <ul id="topicsDiscussed"></ul>
+                            </div>
+                        </div>
+                        <button id="copyAllSummary" class="copy-all-btn">Copy Full Summary</button>
+                        <div class="share-actions">
+                            <p class="share-label">Share</p>
+                            <div class="share-btn-row">
+                                <button id="shareSlackBtn" class="share-btn share-btn-slack">
+                                    <svg class="share-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zm0 1.271a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zm6.124 5.042a2.528 2.528 0 0 1 2.521-2.521A2.528 2.528 0 0 1 20 8.834a2.528 2.528 0 0 1-2.521 2.521h-2.521V8.834zm-1.272 0a2.528 2.528 0 0 1-2.521 2.521 2.528 2.528 0 0 1-2.521-2.521V2.522A2.528 2.528 0 0 1 11.165 0a2.528 2.528 0 0 1 2.521 2.522v6.312zm-6.124 5.042a2.528 2.528 0 0 1 2.521 2.521A2.528 2.528 0 0 1 11.165 24a2.528 2.528 0 0 1-2.521-2.521v-2.521h2.521zm0-1.272a2.528 2.528 0 0 1-2.521-2.521 2.528 2.528 0 0 1 2.521-2.521h6.313A2.528 2.528 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.521h-6.312z"/></svg>
+                                    <span class="share-btn-label">Send to Slack</span>
+                                </button>
+                                <button id="shareGDriveBtn" class="share-btn share-btn-gdrive">
+                                    <svg class="share-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M4.433 22.396l4-6.93H24l-4 6.93H4.433zm3.566-6.93L0 1.604h7.784L15.57 15.466H7.999zm8.282 0L8.718 1.604h7.784l7.498 13.862h-7.717z"/></svg>
+                                    <span class="share-btn-label">Save to Drive</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Screen: Voiceprint Library (Enrollment) ===== -->
+    <div class="screen" id="screenEnroll">
+        <div class="screen-nav">
+            <button class="back-btn" data-target="screenHome">&#8592;</button>
+            <h2 class="screen-title">Voiceprint Library</h2>
+            <div class="nav-spacer"></div>
+        </div>
+        <div class="screen-content scrollable">
+            <p class="screen-desc">Upload a 10-30 second audio sample of each person speaking clearly.</p>
+
+            <div class="form-group">
+                <label for="speakerName">Speaker Name</label>
+                <input type="text" id="speakerName" placeholder="e.g., Shaun">
+            </div>
+
+            <div class="drop-zone" id="enrollDropZone">
+                <p>Drag & drop an audio file here, or click to select</p>
+                <p class="drop-zone-hint">Supports: MP3, M4A, WAV, etc.</p>
+                <input type="file" id="enrollFile" accept="audio/*,.m4a,.mp3,.wav,.ogg,.webm,.mp4,.aac">
+            </div>
+            <div class="file-info" id="enrollFileInfo"></div>
+
+            <button id="enrollBtn" class="btn-primary" disabled>Enroll Speaker</button>
+            <div class="status" id="enrollStatus"></div>
+
+            <h3 class="enrolled-heading">Enrolled Speakers</h3>
+            <div class="speakers-list" id="speakersList">
+                <em class="empty-state">No speakers enrolled yet</em>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Screen: Settings ===== -->
+    <div class="screen" id="screenSettings">
+        <div class="screen-nav">
+            <button class="back-btn" data-target="screenHome">&#8592;</button>
+            <h2 class="screen-title">Settings</h2>
+            <div class="nav-spacer"></div>
+        </div>
+        <div class="screen-content scrollable">
+            <h3 class="screen-desc">Meeting History</h3>
+            <div id="historyList"></div>
+
+            <div class="settings-section">
+                <h3>Settings</h3>
+                <div class="settings-item">
+                    <span class="settings-item-label">Version</span>
+                    <span class="settings-item-value">1.0</span>
+                </div>
+                <button id="clearHistoryBtn" class="clear-history-btn">Clear All History</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Tab Bar (Mobile) ===== -->
+    <nav class="tab-bar" id="tabBar">
+        <button class="tab-bar-item active" data-screen="screenHome">
+            <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Home</span>
+        </button>
+        <button class="tab-bar-item" data-screen="screenEnroll">
+            <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 0 0 8 11a4 4 0 1 1 8 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0 0 15.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 0 0 8 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/></svg>
+            <span>Voiceprint</span>
+        </button>
+        <button class="tab-bar-item" data-screen="settings">
+            <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Settings</span>
+        </button>
+    </nav>
+
+    <script type="module" src="/static/js/main.js"></script>
+</body>
+</html>

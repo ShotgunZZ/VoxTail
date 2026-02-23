@@ -1,0 +1,16 @@
+# torch - installed separately in Dockerfile (CPU-only version to reduce image size)
+speechbrain
+soundfile
+numpy
+pinecone
+assemblyai
+pydub
+python-dotenv
+silero-vad
+fastapi
+uvicorn[standard]
+python-multipart
+huggingface_hub==0.23.5
+openai
+google-api-python-client
+google-auth

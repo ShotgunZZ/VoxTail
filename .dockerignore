@@ -1,0 +1,42 @@
+# Git
+.git
+.gitignore
+
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+dist/
+build/
+
+# Pretrained models (downloaded at runtime)
+pretrained_models/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local development files
+.env
+*.env.local
+speakers.json
+meeting_audio_temp/
+
+# Documentation
+*.md
+*.txt
+!requirements.txt
+
+# Icon generation script (not needed in production)
+generate_icons.py
+
+# SVG icons (PNG versions are used)
+static/icons/*.svg

@@ -1,0 +1,418 @@
+/* ===========================================
+   Speaker Cards — Tier-Based
+   =========================================== */
+.speaker-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.tier-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    margin-bottom: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tier-header:first-child {
+    margin-top: 0;
+}
+
+.tier-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.tier-header.high .tier-dot { background: var(--mm-high-avatar); }
+.tier-header.high { color: var(--mm-high-text); }
+.tier-header.medium .tier-dot { background: var(--mm-med-avatar); }
+.tier-header.medium { color: var(--mm-med-text); }
+.tier-header.low .tier-dot { background: var(--mm-low-avatar); }
+.tier-header.low { color: var(--mm-low-text); }
+
+/* Speaker Card Base */
+.speaker-card {
+    background: var(--mm-card);
+    border-radius: var(--mm-radius);
+    padding: 16px;
+    border: 1px solid var(--mm-border-light);
+    box-shadow: var(--mm-shadow);
+}
+
+.speaker-card.high {
+    border-color: var(--mm-high-border);
+}
+
+.speaker-card.medium {
+    border-color: var(--mm-med-border);
+}
+
+.speaker-card.low {
+    border-color: var(--mm-low-border);
+}
+
+/* Card top row: avatar + info + action */
+.speaker-card .card-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Avatar */
+.speaker-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    color: white;
+    flex-shrink: 0;
+}
+
+.speaker-avatar.green { background: var(--mm-high-avatar); }
+.speaker-avatar.orange { background: var(--mm-med-avatar); }
+.speaker-avatar.gray { background: var(--mm-low-avatar); }
+
+/* Card info */
+.card-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.card-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.card-name {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--mm-text);
+}
+
+/* Confidence Badge */
+.confidence-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.confidence-badge.high {
+    background: var(--mm-high-bg);
+    color: var(--mm-high-text);
+}
+
+.confidence-badge.medium {
+    background: var(--mm-accent-light);
+    color: var(--mm-med-text);
+}
+
+.confidence-badge.low {
+    background: var(--mm-low-bg);
+    color: var(--mm-low-text);
+}
+
+.badge-icon {
+    font-size: 13px;
+}
+
+/* Speaker quote */
+.card-quote {
+    font-size: 13px;
+    color: var(--mm-text-secondary);
+    margin-top: 4px;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Check icon for high confidence */
+.card-check {
+    color: var(--mm-high-avatar);
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+/* Play button for med/low */
+.play-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    font-size: 16px;
+    color: white;
+    transition: transform 0.15s;
+}
+
+.play-btn:hover {
+    transform: scale(1.08);
+}
+
+.play-btn:active {
+    transform: scale(0.95);
+}
+
+.play-btn.orange { background: var(--mm-med-avatar); }
+.play-btn.gray { background: var(--mm-low-avatar); }
+
+.play-btn.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Card suggestion section (medium confidence) */
+.card-suggestion {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--mm-border-light);
+}
+
+.card-suggestion p {
+    font-size: 13px;
+    color: var(--mm-text-muted);
+    margin: 0 0 8px;
+}
+
+.suggestion-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.confirm-btn {
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: var(--mm-accent-light);
+    color: var(--mm-med-text);
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--mm-med-border);
+    font-family: var(--mm-font);
+}
+
+.confirm-btn:hover {
+    background: var(--mm-accent);
+    color: white;
+    border-color: var(--mm-accent);
+}
+
+.confirm-btn.selected {
+    background: var(--mm-accent);
+    color: white;
+    border-color: var(--mm-accent);
+}
+
+.card-confirm-action {
+    margin-top: 10px;
+    text-align: right;
+}
+
+.final-confirm-btn {
+    padding: 10px 28px;
+    border-radius: 20px;
+    background: var(--mm-primary);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    font-family: var(--mm-font);
+    cursor: pointer;
+}
+
+.final-confirm-btn:hover {
+    background: var(--mm-high-text);
+}
+
+.rename-btn {
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: var(--mm-card);
+    color: var(--mm-text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid var(--mm-border);
+    font-family: var(--mm-font);
+}
+
+.rename-btn:hover {
+    background: var(--mm-bg);
+}
+
+/* Add sample toggle row */
+.add-sample-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: var(--mm-accent-bg);
+    border-radius: var(--mm-radius-sm);
+    font-size: 13px;
+    color: var(--mm-med-text);
+}
+
+.toggle-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: var(--mm-border);
+    border-radius: 24px;
+    transition: background 0.2s;
+}
+
+.toggle-slider::before {
+    content: '';
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.2s;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background: var(--mm-accent);
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(20px);
+}
+
+/* Low/unidentified name input */
+.card-name-input {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--mm-border-light);
+}
+
+.name-input-group {
+    display: flex;
+    gap: 8px;
+}
+
+.name-input-group input {
+    flex: 1;
+    padding: 10px 14px;
+    font-size: 14px;
+}
+
+.name-input-group button {
+    padding: 10px 16px;
+    background: var(--mm-primary);
+    color: white;
+    border-radius: var(--mm-radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.name-input-group button:hover {
+    background: #D05A28;
+}
+
+/* Enroll link row */
+.enroll-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--mm-text-muted);
+    cursor: pointer;
+}
+
+.enroll-row:hover {
+    color: var(--mm-primary);
+}
+
+.enroll-row .fp-icon {
+    font-size: 16px;
+}
+
+/* Undo button on decided cards */
+.undo-btn {
+    padding: 6px 14px;
+    border-radius: 16px;
+    background: transparent;
+    color: var(--mm-text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid var(--mm-border);
+    cursor: pointer;
+    flex-shrink: 0;
+    font-family: var(--mm-font);
+    transition: all 0.15s;
+}
+
+.undo-btn:hover {
+    background: var(--mm-bg);
+    color: var(--mm-text);
+    border-color: var(--mm-text-secondary);
+}
+
+/* Decided card subtle styling */
+.speaker-card.decided {
+    opacity: 0.85;
+}
+
+/* Action success */
+.action-success {
+    color: var(--mm-high-text);
+    font-size: 13px;
+    margin-top: 8px;
+}
+
+/* Audio too short states */
+.audio-too-short {
+    font-size: 11px;
+    color: var(--mm-text-muted);
+    font-style: italic;
+    white-space: nowrap;
+}
+
+.audio-insufficient {
+    margin-top: 12px;
+    padding: 12px;
+    background: var(--mm-bg);
+    border-radius: var(--mm-radius-sm);
+    font-size: 13px;
+    color: var(--mm-text-muted);
+    font-style: italic;
+    text-align: center;
+}

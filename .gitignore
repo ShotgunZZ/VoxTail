@@ -1,0 +1,34 @@
+# Environment and secrets
+.env
+*.env.local
+
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Pretrained models (large files, downloaded on first run)
+pretrained_models/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Local data
+speakers.json
+meeting_audio_temp/

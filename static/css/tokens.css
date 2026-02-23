@@ -1,0 +1,42 @@
+/* ===========================================
+   VoxTail Design Tokens
+   =========================================== */
+:root {
+    --mm-primary: #E86A33;
+    --mm-primary-light: #FDDCC8;
+    --mm-accent: #FF8400;
+    --mm-accent-light: #FFF0DB;
+    --mm-accent-bg: #FFF7ED;
+    --mm-bg: #F5F4F1;
+    --mm-card: #FFFFFF;
+    --mm-text: #1A1918;
+    --mm-text-secondary: #6D6C6A;
+    --mm-text-muted: #9C9B99;
+    --mm-border: #E5E4E1;
+    --mm-border-light: #EDECEA;
+    --mm-shadow: 0 2px 12px rgba(26,25,24,0.03);
+    --mm-radius: 16px;
+    --mm-radius-sm: 12px;
+    --mm-font: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+    /* Confidence tier colors */
+    --mm-high-border: #C8F0D8;
+    --mm-high-bg: #F0FAF4;
+    --mm-high-text: #2D6E42;
+    --mm-high-avatar: #3D8A5A;
+    --mm-med-border: #FFD9A8;
+    --mm-med-bg: #FFF7ED;
+    --mm-med-text: #8B5E1E;
+    --mm-med-avatar: #E08A3C;
+    --mm-low-border: #E5E4E1;
+    --mm-low-bg: #F8F8F7;
+    --mm-low-text: #6D6C6A;
+    --mm-low-avatar: #9C9B99;
+
+    /* Speaker colors for transcript */
+    --speaker-1: #E86A33;
+    --speaker-2: #D89575;
+    --speaker-3: #5B7DB1;
+    --speaker-4: #A67BB5;
+    --speaker-5: #6D6C6A;
+}

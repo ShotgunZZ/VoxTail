@@ -1,0 +1,193 @@
+/* ===========================================
+   Meeting History
+   =========================================== */
+.history-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--mm-text-muted);
+    font-size: 14px;
+}
+
+.history-card {
+    background: var(--mm-card);
+    border-radius: var(--mm-radius);
+    margin-bottom: 12px;
+    border: 1px solid var(--mm-border-light);
+    box-shadow: var(--mm-shadow);
+    overflow: hidden;
+}
+
+.history-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.history-card-header:active {
+    background: var(--mm-bg);
+}
+
+.history-card-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.history-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--mm-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.history-meta {
+    font-size: 12px;
+    color: var(--mm-text-muted);
+    margin-top: 2px;
+    display: block;
+}
+
+.history-card .accordion-chevron {
+    font-size: 12px;
+    color: var(--mm-text-muted);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+    margin-left: 12px;
+}
+
+.history-card.collapsed .accordion-chevron {
+    transform: rotate(-90deg);
+}
+
+.history-card-content {
+    padding: 0 16px 16px;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.history-card.collapsed .history-card-content {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.history-speakers {
+    font-size: 13px;
+    color: var(--mm-text-secondary);
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--mm-border-light);
+}
+
+.history-speakers .assignee {
+    color: var(--mm-primary);
+    font-weight: 500;
+}
+
+.history-summary-section {
+    margin-bottom: 12px;
+}
+
+.history-summary-section h5 {
+    margin: 0 0 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--mm-text);
+}
+
+.history-summary-section p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--mm-text);
+}
+
+.history-summary-section ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.history-summary-section li {
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 4px;
+}
+
+.history-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 12px;
+    border-top: 1px solid var(--mm-border-light);
+}
+
+.history-delete-btn {
+    padding: 6px 14px;
+    font-size: 12px;
+    font-family: var(--mm-font);
+    background: transparent;
+    color: #C53030;
+    border: 1px solid #FFCCCB;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.history-delete-btn:hover {
+    background: #FFF5F5;
+}
+
+/* Settings section below history */
+.settings-section {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--mm-border);
+}
+
+.settings-section h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--mm-text);
+    margin: 0 0 12px;
+}
+
+.settings-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--mm-border-light);
+    font-size: 14px;
+    color: var(--mm-text);
+}
+
+.settings-item-label {
+    color: var(--mm-text);
+}
+
+.settings-item-value {
+    color: var(--mm-text-muted);
+    font-size: 13px;
+}
+
+.clear-history-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    font-family: var(--mm-font);
+    font-weight: 600;
+    background: transparent;
+    color: #C53030;
+    border: 1px solid #FFCCCB;
+    border-radius: var(--mm-radius-sm);
+    cursor: pointer;
+    margin-top: 12px;
+}
+
+.clear-history-btn:hover {
+    background: #FFF5F5;
+}
