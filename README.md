@@ -73,6 +73,8 @@ Railway will prompt you for API keys during setup. You'll need:
 | [Pinecone](https://www.pinecone.io/) | API key from console | Yes — free starter plan |
 | [OpenAI](https://platform.openai.com/) | API key from settings | No — requires payment method |
 
+For `PINECONE_INDEX_NAME`, choose any name you like (e.g., `voxtail`). The app will create the index automatically on first run.
+
 After deploying, Railway gives you a public URL with HTTPS (required for microphone access on mobile).
 
 ### Option 2: Run Locally
@@ -93,6 +95,7 @@ pip install -r requirements.txt
 # Configure API keys
 cp .env.example .env
 # Edit .env with your API keys (see table above)
+# Set PINECONE_INDEX_NAME to any name you like (e.g., "voxtail")
 
 # Create Pinecone index (one-time)
 python setup_pinecone.py

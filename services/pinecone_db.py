@@ -1,8 +1,9 @@
 """Pinecone vector database service for speaker embeddings."""
 import logging
+import time
 from typing import Optional, Tuple, List
 
-from pinecone import Pinecone
+from pinecone import Pinecone, ServerlessSpec
 import config
 
 logger = logging.getLogger(__name__)
@@ -11,10 +12,20 @@ _index = None
 
 
 def get_index():
-    """Get Pinecone index (cached)."""
+    """Get Pinecone index (cached). Creates the index if it doesn't exist."""
     global _index
     if _index is None:
         pc = Pinecone(api_key=config.PINECONE_API_KEY)
+        if config.PINECONE_INDEX_NAME not in pc.list_indexes().names():
+            logger.info("Index '%s' not found — creating...", config.PINECONE_INDEX_NAME)
+            pc.create_index(
+                name=config.PINECONE_INDEX_NAME,
+                dimension=config.EMBEDDING_DIM,
+                metric="cosine",
+                spec=ServerlessSpec(cloud="aws", region="us-east-1"),
+            )
+            time.sleep(5)
+            logger.info("Index '%s' created.", config.PINECONE_INDEX_NAME)
         _index = pc.Index(config.PINECONE_INDEX_NAME)
     return _index
 
