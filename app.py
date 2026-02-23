@@ -4,13 +4,13 @@ import os
 import shutil
 import sys
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse
 
-import config
 from routes import api_router
 from services.enrollment_svc import sync_speakers_from_pinecone
+import config
 
 TEMP_AUDIO_DIR = "meeting_audio_temp"
 
@@ -21,47 +21,6 @@ logging.getLogger("speechbrain").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Speaker Recognition MVP")
-
-
-@app.middleware("http")
-async def check_invite_code(request: Request, call_next):
-    """Gate all /api/* routes behind an invite code (if configured)."""
-    if (
-        request.url.path.startswith("/api/")
-        and request.url.path != "/api/validate-invite"
-    ):
-        code = request.headers.get("X-Invite-Code", "")
-        valid_codes = [c for c in [config.INVITE_CODE, config.ADMIN_CODE] if c]
-        if valid_codes and code not in valid_codes:
-            return JSONResponse(
-                status_code=401,
-                content={"detail": "Invalid or missing invite code"}
-            )
-    return await call_next(request)
-
-
-@app.post("/api/validate-invite")
-async def validate_invite(request: Request):
-    """Validate an invitation code and return admin status."""
-    body = await request.json()
-    code = body.get("code", "")
-
-    # No gate configured
-    if not config.INVITE_CODE and not config.ADMIN_CODE:
-        return {"valid": True, "admin": True}
-
-    # Check admin code first
-    if config.ADMIN_CODE and code == config.ADMIN_CODE:
-        return {"valid": True, "admin": True}
-
-    # Check regular invite code
-    if config.INVITE_CODE and code == config.INVITE_CODE:
-        return {"valid": True, "admin": False}
-
-    return JSONResponse(
-        status_code=401,
-        content={"valid": False, "detail": "Invalid invite code"}
-    )
 
 
 # Mount API routes

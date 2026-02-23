@@ -51,17 +51,6 @@ SESSION_TTL_HOURS = 1  # Meeting session expiry time (reduced for faster cleanup
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_MODEL = "gpt-5.2-chat-latest"  # GPT-5.2 Instant: ~$0.10 per summary
 
-# Slack integration
-SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
-
-# Google Drive integration (service account)
-GOOGLE_SERVICE_ACCOUNT_JSON = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")  # File path or inline JSON
-GOOGLE_DRIVE_FOLDER_ID = os.getenv("GOOGLE_DRIVE_FOLDER_ID")
-
-# Invitation code gate (empty = no gate)
-INVITE_CODE = os.getenv("INVITE_CODE", "")
-ADMIN_CODE = os.getenv("ADMIN_CODE", "")
-
 
 def validate():
     """Check required environment variables and warn about any that are missing."""
