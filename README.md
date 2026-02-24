@@ -15,20 +15,20 @@ Enroll speakers via voice samples, record or upload meetings, and get AI-powered
 ## How It Works
 
 ```
-                          VoxTail Pipeline
+                              VoxTail Pipeline
 
-  Audio File ──► AssemblyAI ──► SpeechBrain ──► Pinecone ──► Results
-   (upload/       (transcribe    (extract        (match       (labeled
-    record)        + diarize)     embeddings)     speakers)    transcript)
-                                                      │
-                                                      ▼
-                                                   OpenAI GPT
-                                                  (AI summary)
+  Audio File ──► AssemblyAI ──► Silero VAD ──► SpeechBrain ──► Pinecone ──► Results
+   (upload/       (transcribe    (strip          (extract        (match       (labeled
+    record)        + diarize)     silence)        embeddings)     speakers)    transcript)
+                                                                      │
+                                                                      ▼
+                                                                   OpenAI GPT
+                                                                  (AI summary)
 ```
 
 1. Upload a meeting recording or record live from your microphone
 2. AssemblyAI transcribes the audio and separates speakers (diarization)
-3. SpeechBrain ECAPA-TDNN extracts a 192-dimensional voice embedding per speaker
+3. Silero VAD strips silence and noise, then SpeechBrain ECAPA-TDNN extracts a 192-dimensional voice embedding per speaker
 4. Pinecone matches embeddings against enrolled voice profiles
 5. You review results — confirm uncertain matches, enroll new speakers
 6. OpenAI generates an executive summary with action items and decisions
@@ -168,6 +168,7 @@ See [CLAUDE.md](CLAUDE.md) for the full technical reference.
 ## Tech Stack
 
 - **[SpeechBrain](https://speechbrain.github.io/) ECAPA-TDNN** — Speaker embeddings (192-dim)
+- **[Silero VAD](https://github.com/snakers4/silero-vad)** — Voice activity detection (strips silence for cleaner embeddings)
 - **[Pinecone](https://www.pinecone.io/)** — Vector similarity search
 - **[AssemblyAI](https://www.assemblyai.com/)** — Transcription + speaker diarization
 - **[OpenAI GPT](https://platform.openai.com/)** — Meeting summaries
