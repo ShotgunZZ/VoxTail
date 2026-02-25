@@ -52,11 +52,9 @@ async def confirm_speaker(
 
     # Optionally enroll to reinforce the speaker model
     if enroll and speaker_id in session.speaker_embeddings:
-        segments = session.speaker_segments[speaker_id]
-        total_duration = sum(end - start for start, end in segments)
-
-        # Only reinforce if sufficient audio (>= 10s for quality)
-        if total_duration >= 10000:
+        # Skip reinforcement for low speech quality speakers
+        speaker_data = next((sr for sr in session.speakers if sr["meeting_speaker_id"] == speaker_id), None)
+        if speaker_data and not speaker_data.get("low_speech_quality"):
             embedding = session.speaker_embeddings[speaker_id]
             # Use weight=1 for meeting reinforcement (dedicated enrollment uses weight=2)
             total_weight = add_speaker_sample(confirmed_name, embedding, weight=1)
@@ -70,7 +68,7 @@ async def confirm_speaker(
             result["total_weight"] = total_weight
             logger.info(f"Reinforced speaker '{confirmed_name}' from meeting {meeting_id} (total weight: {total_weight})")
         else:
-            logger.info(f"Skipped reinforcement for '{confirmed_name}' - insufficient audio ({total_duration/1000:.1f}s)")
+            logger.info(f"Skipped reinforcement for '{confirmed_name}' - low speech quality")
 
     # Update session speaker record with confirmed name
     for sr in session.speakers:

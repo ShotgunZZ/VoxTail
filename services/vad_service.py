@@ -66,6 +66,28 @@ def get_speech_duration_ms(audio_path: str) -> float:
     return total_samples / sample_rate * 1000
 
 
+def strip_silence_file(input_path: str, output_path: str):
+    """Strip silence from a WAV file and save the cleaned audio.
+
+    Loads audio, runs strip_silence() to remove non-speech portions,
+    and writes the result as 16kHz mono WAV.
+
+    Args:
+        input_path: Path to input WAV file
+        output_path: Path to save cleaned WAV file
+    """
+    data, sample_rate = sf.read(input_path, dtype="float32")
+    audio_tensor = torch.from_numpy(data)
+    if audio_tensor.dim() > 1:
+        audio_tensor = audio_tensor.mean(dim=1)
+    if sample_rate != 16000:
+        import torchaudio.functional as F
+        audio_tensor = F.resample(audio_tensor, sample_rate, 16000)
+        sample_rate = 16000
+    cleaned = strip_silence(audio_tensor, sample_rate)
+    sf.write(output_path, cleaned.numpy(), sample_rate)
+
+
 def strip_silence(audio_tensor, sample_rate=16000):
     """Return audio tensor with silence removed, concatenating speech segments.
 

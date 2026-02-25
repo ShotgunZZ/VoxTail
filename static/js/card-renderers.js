@@ -102,6 +102,7 @@ export function renderMediumCard(s) {
                         <span class="confidence-badge medium"><span class="badge-icon">&#9888;</span> ${score}%</span>
                     </div>
                     ${quote ? `<div class="card-quote">"${escapeHtml(quote)}"</div>` : ''}
+                    ${s.low_speech_quality ? `<div class="card-warning">&#9888; Low audio quality — match may be less reliable</div>` : ''}
                 </div>
                 ${canPlay
                     ? `<button class="play-btn orange" data-clip-url="${escapeHtml(clipUrl)}">&#9654;</button>`
@@ -112,9 +113,10 @@ export function renderMediumCard(s) {
                 <p>Best match from voiceprint library:</p>
                 <div class="suggestion-buttons">
                     ${candidateButtons}
-                    <button class="rename-btn" data-speaker-id="${escapedId}">&#9998; New Name</button>
+                    ${!s.low_speech_quality ? `<button class="rename-btn" data-speaker-id="${escapedId}">&#9998; New Name</button>` : ''}
                 </div>
             </div>
+            ${!s.low_speech_quality ? `
             <div class="add-sample-row hidden">
                 <span>Add this sample to strengthen voiceprint</span>
                 <label class="toggle-switch">
@@ -122,6 +124,7 @@ export function renderMediumCard(s) {
                     <span class="toggle-slider"></span>
                 </label>
             </div>
+            ` : ''}
             <div class="card-confirm-action hidden">
                 <button class="final-confirm-btn" data-speaker-id="${escapedId}">Confirm</button>
             </div>
@@ -149,13 +152,14 @@ export function renderLowCard(s) {
                         <span class="card-name">Speaker ${escapedId}</span>
                     </div>
                     ${quote ? `<div class="card-quote">"${escapeHtml(quote)}"</div>` : ''}
+                    ${s.low_speech_quality ? `<div class="card-warning">&#9888; Low audio quality — match may be less reliable</div>` : ''}
                 </div>
                 ${canPlay
                     ? `<button class="play-btn gray" data-clip-url="${escapeHtml(clipUrl)}">&#9654;</button>`
                     : `<span class="audio-too-short">Audio too short</span>`
                 }
             </div>
-            ${canPlay ? `
+            ${canPlay && !s.low_speech_quality ? `
                 <div class="card-name-input">
                     <div class="name-input-group">
                         <input type="text" id="name-${escapedId}" placeholder="Enter speaker name...">
@@ -168,7 +172,9 @@ export function renderLowCard(s) {
                 </div>
             ` : `
                 <div class="audio-insufficient">
-                    <span>Insufficient audio for voiceprint registration</span>
+                    <span>${s.low_speech_quality
+                        ? 'Not enough speech for voiceprint registration'
+                        : 'Insufficient audio for voiceprint registration'}</span>
                 </div>
             `}
         </div>

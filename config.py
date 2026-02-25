@@ -32,6 +32,9 @@ STITCHING_MAX_SINGLE_MS = 20000        # Cap single utterance at 20s
 STITCHING_TARGET_DURATION_MS = 20000   # Target 20s when stitching
 STITCHING_MAX_COUNT = 5                # Max utterances to stitch
 
+# Minimum speech duration for reliable identification (below this = quality warning)
+MIN_IDENTIFICATION_SPEECH_MS = 8000
+
 # Speaker clip playback parameters
 CLIP_MIN_DURATION_MS = 2000   # Minimum for playback and enrollment
 CLIP_MAX_DURATION_MS = 5000   # Maximum clip duration

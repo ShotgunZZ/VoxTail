@@ -416,3 +416,9 @@
     font-style: italic;
     text-align: center;
 }
+
+.card-warning {
+    color: var(--orange);
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}

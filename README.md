@@ -9,7 +9,9 @@ Enroll speakers via voice samples, record or upload meetings, and get AI-powered
 - **Speaker Enrollment** — Build voice profiles from short audio samples
 - **Meeting Identification** — Automatically label who said what with confidence levels
 - **AI Summaries** — Executive summary, action items, key decisions via OpenAI GPT
-- **Audio Clip Playback** — Listen to speaker clips to verify identity
+- **Audio Clip Playback** — Listen to VAD-cleaned speaker clips to verify identity
+- **Speech Quality Detection** — Warns when speakers have insufficient audio; blocks unreliable enrollments
+- **VAD-Cleaned Clips** — Playback clips are processed through Voice Activity Detection to remove silence and background noise
 - **Installable PWA** — Add to home screen, works on phone and desktop
 
 ## How It Works

@@ -19,7 +19,7 @@ def select_segments_for_speaker(
     speaker_id: str,
     wav_path: str,
     audio: AudioSegment
-) -> Tuple[List[Tuple[int, int]], Optional[str]]:
+) -> Tuple[List[Tuple[int, int]], Optional[str], float]:
     """Select segments for a speaker using incremental VAD-aware selection.
 
     Starts with the longest utterance, checks how much speech VAD detects,
@@ -32,7 +32,7 @@ def select_segments_for_speaker(
         audio: Pre-loaded AudioSegment of the WAV file.
 
     Returns:
-        Tuple of (segments list, temp_wav_path or None).
+        Tuple of (segments list, temp_wav_path or None, speech_ms).
         temp_wav_path is the extracted audio ready for embedding, caller must delete it.
     """
     sorted_utts = sorted(
@@ -49,7 +49,7 @@ def select_segments_for_speaker(
 
     if not candidates:
         logger.info("Speaker %s: no utterances >= %dms", speaker_id, config.STITCHING_MIN_UTTERANCE_MS)
-        return [], None
+        return [], None, 0.0
 
     segments = []
     total_raw_ms = 0
@@ -66,10 +66,6 @@ def select_segments_for_speaker(
         if utt_duration > config.STITCHING_MAX_SINGLE_MS:
             end = start + config.STITCHING_MAX_SINGLE_MS
             utt_duration = config.STITCHING_MAX_SINGLE_MS
-
-        # Check if adding this would exceed raw duration cap
-        if total_raw_ms + utt_duration > config.STITCHING_MAX_SINGLE_MS and segments:
-            break
 
         segments.append((start, end))
         total_raw_ms += utt_duration
@@ -106,21 +102,21 @@ def select_segments_for_speaker(
     if not segments:
         if temp_path and os.path.exists(temp_path):
             os.remove(temp_path)
-        return [], None
+        return [], None, 0.0
 
     logger.info(
         "Speaker %s: selected %d utterance(s), %.1fs raw → %.1fs speech",
         speaker_id, len(segments), total_raw_ms / 1000, speech_ms / 1000
     )
 
-    return segments, temp_path
+    return segments, temp_path, speech_ms
 
 
 def extract_speaker_embeddings(
     unique_speakers: set,
     utterances: list,
     wav_path: str
-) -> Tuple[Dict[str, List[float]], Dict[str, List[Tuple[int, int]]]]:
+) -> Tuple[Dict[str, List[float]], Dict[str, List[Tuple[int, int]]], Dict[str, dict]]:
     """Extract embeddings and select segments for all speakers in a meeting.
 
     Args:
@@ -129,10 +125,11 @@ def extract_speaker_embeddings(
         wav_path: Path to the converted WAV file.
 
     Returns:
-        Tuple of (speaker_embeddings dict, speaker_segments dict).
+        Tuple of (speaker_embeddings dict, speaker_segments dict, speech_quality dict).
     """
     speaker_embeddings = {}
     speaker_segments = {}
+    speech_quality = {}
 
     # Load WAV once — avoids re-reading the full file for each speaker
     audio = load_wav(wav_path)
@@ -140,10 +137,14 @@ def extract_speaker_embeddings(
 
     for speaker_id in unique_speakers:
         speaker_utts = [u for u in utterances if u["speaker"] == speaker_id]
-        segments, segment_path = select_segments_for_speaker(
+        segments, segment_path, speech_ms = select_segments_for_speaker(
             speaker_utts, speaker_id, wav_path, audio
         )
         speaker_segments[speaker_id] = segments
+        speech_quality[speaker_id] = {
+            "speech_ms": speech_ms,
+            "low_quality": speech_ms < config.MIN_IDENTIFICATION_SPEECH_MS
+        }
 
         if not segment_path:
             total_duration = sum(end - start for start, end in segments)
@@ -151,10 +152,16 @@ def extract_speaker_embeddings(
             continue
 
         try:
+            raw_duration = sum(end - start for start, end in segments) / 1000
+            logger.info(
+                "Speaker %s: extracting embedding from VAD-cleaned audio (%d segments, %.1fs raw)",
+                speaker_id, len(segments), raw_duration
+            )
             embedding = get_embedding(segment_path)
             speaker_embeddings[speaker_id] = embedding
         finally:
             if os.path.exists(segment_path):
                 os.remove(segment_path)
 
-    return speaker_embeddings, speaker_segments
+    logger.info("Extracted embeddings for %d/%d speakers", len(speaker_embeddings), len(unique_speakers))
+    return speaker_embeddings, speaker_segments, speech_quality

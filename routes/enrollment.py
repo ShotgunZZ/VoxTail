@@ -70,6 +70,14 @@ async def enroll_from_meeting(
     if not segments:
         raise HTTPException(status_code=400, detail=f"No audio segments for speaker {speaker_id}")
 
+    # Block enrollment for low speech quality speakers
+    for sr in session.speakers:
+        if sr["meeting_speaker_id"] == speaker_id and sr.get("low_speech_quality"):
+            raise HTTPException(
+                status_code=400,
+                detail="Cannot enroll — not enough speech detected for a reliable voiceprint"
+            )
+
     # Check if we already have an embedding for this speaker
     if speaker_id in session.speaker_embeddings:
         # Use existing embedding from the meeting

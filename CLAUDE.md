@@ -121,9 +121,9 @@ Competitive assignment uses Hungarian algorithm (scipy `linear_sum_assignment`) 
 
 **SSE Streaming** (routes/identification.py → static/js/identification.js): `POST /api/identify` returns a `StreamingResponse` (`text/event-stream`) from an async generator. All blocking calls (`transcribe_with_diarization`, `convert_to_wav`, `extract_speaker_embeddings`, `match_speakers_competitively`) run in background threads via `asyncio.to_thread()` to avoid blocking the event loop. During transcription (30-120+ seconds), SSE heartbeat comments (`: heartbeat\n\n`) are sent every 15 seconds to keep the connection alive through Railway's reverse proxy idle timeout. The generator catches `BaseException` (including `GeneratorExit`) to log client disconnects and has a `finally` block for temp file cleanup. Frontend `readSSEStream()` parses the stream and updates the UI with real-time progress messages. `api-client.js` returns the raw `Response` object for this endpoint (not parsed JSON).
 
-**Speaker Audio Clips** (routes/identification.py): `GET /api/meeting/{id}/speaker/{speaker_id}/clip` returns a WAV audio clip of the speaker's longest utterance (2–5s, configured via `CLIP_MIN_DURATION_MS` / `CLIP_MAX_DURATION_MS` in config.py). Used by speaker cards for audio playback during confirmation.
+**Speaker Audio Clips** (routes/identification.py): `GET /api/meeting/{id}/speaker/{speaker_id}/clip` returns a VAD-cleaned WAV audio clip from the speaker's identification segments (up to 5s, configured via `CLIP_MAX_DURATION_MS` in config.py). All identification segments are stitched together, then `strip_silence_file()` removes silence/pauses using Silero VAD — so playback matches the clean speech the identification model analyzed. Used by speaker cards for audio playback during confirmation.
 
-**Stitching Parameters** (config.py): When longest utterance < 10s, stitch multiple utterances (min 2s each) targeting 20s total, max 5 segments.
+**Stitching Parameters** (config.py): Segment selection uses speech duration as the budget (not raw duration). Individual utterances capped at 20s, loop adds utterances until 10s of speech accumulated or 5 segments used. Speakers with < 8s speech (`MIN_IDENTIFICATION_SPEECH_MS`) after selection get `low_speech_quality` flag — still matched but enrollment/reinforcement blocked and UI shows warning.
 
 **Meeting History** (static/js/history.js): Meetings are saved to browser-local IndexedDB after summary generation. Stores up to 50 entries with auto-pruning. The Settings screen (`screenSettings`) displays history as accordion cards with executive summary, action items, decisions, and topics. Clear-all button available in the settings section.
 
@@ -152,5 +152,5 @@ Competitive assignment uses Hungarian algorithm (scipy `linear_sum_assignment`) 
 - AssemblyAI costs ~$0.90/hour of audio
 - Model runs on CPU (device="cpu" in speaker_encoder.py)
 - Frontend uses ES modules with `escapeHtml()` for XSS prevention
-- **Service Worker Caching**: `static/sw.js` uses cache-first. After changing any file in `static/`, bump `CACHE_NAME` in `sw.js` (currently `v32`). The browser auto-reloads when the new SW activates. `app.py` serves `sw.js` with `Cache-Control: no-cache` so browsers always check for updates.
+- **Service Worker Caching**: `static/sw.js` uses cache-first. After changing any file in `static/`, bump `CACHE_NAME` in `sw.js` (currently `v33`). The browser auto-reloads when the new SW activates. `app.py` serves `sw.js` with `Cache-Control: no-cache` so browsers always check for updates.
 

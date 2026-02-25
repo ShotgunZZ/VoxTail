@@ -9,7 +9,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException, Request
 from fastapi.responses import FileResponse, StreamingResponse
 
 from services.assemblyai_svc import transcribe_with_diarization
-from services.audio import convert_to_wav, extract_segment
+from services.audio import convert_to_wav, extract_segment, stitch_segments
 from services.audio_segmentation import extract_speaker_embeddings
 from services.matching import match_speakers_competitively
 from services.speaker_mapping import build_speaker_name_map
@@ -50,6 +50,8 @@ async def identify_speakers(
 
     async def generate():
         try:
+            logger.info(f"Meeting {meeting_id}: starting speaker identification")
+
             yield _sse_event("progress", {
                 "stage": "transcribing",
                 "message": "Transcribing audio (this takes a while for longer recordings)..."
@@ -107,7 +109,7 @@ async def identify_speakers(
                 "message": "Analyzing speaker voices..."
             })
 
-            speaker_embeddings, speaker_segments = await asyncio.to_thread(
+            speaker_embeddings, speaker_segments, speech_quality = await asyncio.to_thread(
                 extract_speaker_embeddings, unique_speakers, utterances, str(wav_path)
             )
 
@@ -133,6 +135,9 @@ async def identify_speakers(
                     result_dict = match_results[speaker_id].to_dict()
                     result_dict["segments"] = segments_dict
                     result_dict["longest_utterance_ms"] = longest_utterance_ms
+                    sq = speech_quality.get(speaker_id, {})
+                    result_dict["low_speech_quality"] = sq.get("low_quality", False)
+                    result_dict["speech_duration_ms"] = sq.get("speech_ms", 0)
                     speakers_response.append(result_dict)
 
                     mr = match_results[speaker_id]
@@ -151,7 +156,9 @@ async def identify_speakers(
                         "needs_confirmation": False,
                         "needs_naming": True,
                         "segments": segments_dict,
-                        "longest_utterance_ms": longest_utterance_ms
+                        "longest_utterance_ms": longest_utterance_ms,
+                        "low_speech_quality": speech_quality.get(speaker_id, {}).get("low_quality", False),
+                        "speech_duration_ms": speech_quality.get(speaker_id, {}).get("speech_ms", 0),
                     })
 
             speaker_name_map = build_speaker_name_map(speakers_response, "Unknown ({sid})")
@@ -240,8 +247,9 @@ async def get_meeting(meeting_id: str):
 
 @router.get("/meeting/{meeting_id}/speaker/{speaker_id}/clip")
 async def get_speaker_clip(meeting_id: str, speaker_id: str):
-    """Return audio clip of speaker's longest utterance (2-5 seconds)."""
+    """Return VAD-cleaned audio clip from the speaker's identification segments (up to 5s)."""
     import config
+    from services.vad_service import strip_silence_file
 
     session_store = get_session_store()
     session = session_store.get(meeting_id)
@@ -249,31 +257,39 @@ async def get_speaker_clip(meeting_id: str, speaker_id: str):
     if session is None:
         raise HTTPException(status_code=404, detail="Meeting session not found or expired")
 
-    # Find all utterances for this speaker and pick the longest
-    speaker_utts = [u for u in session.utterances if u["speaker"] == speaker_id]
-    if not speaker_utts:
+    segments = session.speaker_segments.get(speaker_id, [])
+    if not segments:
         raise HTTPException(status_code=404, detail="Speaker not found in meeting")
-
-    longest_utt = max(speaker_utts, key=lambda u: u["end"] - u["start"])
-    duration_ms = longest_utt["end"] - longest_utt["start"]
-
-    if duration_ms < config.CLIP_MIN_DURATION_MS:
-        raise HTTPException(status_code=400, detail="Audio too short for playback")
 
     audio_path = session.audio_path
     if not Path(audio_path).exists():
         raise HTTPException(status_code=404, detail="Audio file no longer available")
 
-    # Cap at max duration
-    start_ms = longest_utt["start"]
-    end_ms = min(longest_utt["end"], start_ms + config.CLIP_MAX_DURATION_MS)
-
+    raw_clip_path = str(session_store.audio_dir / f"{meeting_id}_{speaker_id}_clip_raw.wav")
     clip_path = str(session_store.audio_dir / f"{meeting_id}_{speaker_id}_clip.wav")
 
     try:
-        await asyncio.to_thread(extract_segment, audio_path, start_ms, end_ms, clip_path)
+        # Stitch all identification segments (same audio used for embedding)
+        if len(segments) == 1:
+            start_ms, end_ms = segments[0]
+            await asyncio.to_thread(extract_segment, audio_path, start_ms, end_ms, raw_clip_path)
+        else:
+            await asyncio.to_thread(stitch_segments, audio_path, segments, raw_clip_path)
+
+        # Strip silence using VAD (same processing as identification pipeline)
+        await asyncio.to_thread(strip_silence_file, raw_clip_path, clip_path)
+
+        # Cap at configured max duration
+        from services.audio import load_wav
+        clip_audio = await asyncio.to_thread(load_wav, clip_path)
+        if len(clip_audio) > config.CLIP_MAX_DURATION_MS:
+            clip_audio = clip_audio[:config.CLIP_MAX_DURATION_MS]
+            clip_audio = clip_audio.set_frame_rate(16000).set_channels(1)
+            await asyncio.to_thread(clip_audio.export, clip_path, format="wav")
     except Exception as e:
         logger.error(f"Failed to extract speaker clip: {e}")
         raise HTTPException(status_code=500, detail="Failed to extract audio clip")
+    finally:
+        Path(raw_clip_path).unlink(missing_ok=True)
 
     return FileResponse(clip_path, media_type="audio/wav", filename=f"speaker_{speaker_id}_clip.wav")
